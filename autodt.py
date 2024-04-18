@@ -2,27 +2,27 @@ import time
 import pygetwindow as gw
 from pyvda import VirtualDesktop, AppView
 
-# 用于存储已经最大化并且已经移动到新虚拟桌面的窗口的句柄
+# To store handles for windows that have been maximized and have been moved to the new virtual desktop
 maximized_windows = set()
 
-# 用于存储新创建的虚拟桌面对象
+# Use to store the newly created virtual desktop objects
 desktops = {}
 
 def manage_windows():
     global maximized_windows, desktops
     for win in gw.getAllWindows():
         if win.isMaximized and win._hWnd not in maximized_windows:
-            # 如果窗口最大化并且之前没有处理过
-            new_desktop = VirtualDesktop.create()  # 创建新的虚拟桌面
-            AppView(hwnd=win._hWnd).move(new_desktop)  # 移动窗口到新的虚拟桌面
-            new_desktop.go()  # 切换到新的虚拟桌面
-            maximized_windows.add(win._hWnd)  # 记录这个窗口已经处理过
-            desktops[win._hWnd] = new_desktop  # 存储这个窗口对应的虚拟桌面
+            # If the window is maximized and is not processed before
+            new_desktop = VirtualDesktop.create()  # Create a new virtual desktop
+            AppView(hwnd=win._hWnd).move(new_desktop)  # Move the window to the new virtual desktop
+            new_desktop.go()  # Switch to a new virtual desktop
+            maximized_windows.add(win._hWnd)  # Record that this window has been processed
+            desktops[win._hWnd] = new_desktop  # Stores the virtual desktop corresponding to this window
         elif not win.isMaximized and win._hWnd in maximized_windows:
-            # 如果窗口不再最大化并且之前处理过
-            desktops[win._hWnd].remove()  # 删除之前创建的虚拟桌面
-            del desktops[win._hWnd]  # 从字典中删除这个虚拟桌面的记录
-            maximized_windows.remove(win._hWnd)  # 从集合中删除这个窗口的记录
+            # If the window is no longer maximized and was processed before
+            desktops[win._hWnd].remove()  # Delete a previously created virtual desktop
+            del desktops[win._hWnd]  # Remove the record of this virtual desktop from the dictionary
+            maximized_windows.remove(win._hWnd)  # Remove the record of this window from the collection
 
 while True:
     manage_windows()
